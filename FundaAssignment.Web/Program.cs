@@ -1,13 +1,18 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using FundaAssignment.Web.Data;
+using FundaAssignment.ApiClient;
+using FundaAssignment.Core.Interfaces;
+using FundaAssignment.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var fundaApiSettings = builder.Configuration
+    .GetSection("FundaApi")
+    .Get<FundaApiSettings>() ?? new FundaApiSettings();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton(fundaApiSettings);
+builder.Services.AddHttpClient<IFundaApiClient, FundaApiClient>();
+builder.Services.AddTransient<IMakelaarRankingService, MakelaarRankingService>();
 
 var app = builder.Build();
 
