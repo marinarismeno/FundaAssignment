@@ -15,7 +15,7 @@ namespace FundaAssignment.ApiClient
 
         public async Task<IEnumerable<Listing>> GetAllListingsAsync(string searchQuery, CancellationToken cancellationToken = default)
         {
-            string uri = settings.BaseUrl + "/" + settings.ApiKey  + searchQuery;
+            string uri = settings.BaseUrl + settings.ApiKey  + searchQuery;
 
             int totalNumOfPages = -1;
             int currentPage = 1;

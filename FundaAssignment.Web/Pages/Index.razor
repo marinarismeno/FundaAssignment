@@ -1,9 +1,124 @@
 ﻿@page "/"
+@using FundaAssignment.Core.Interfaces
+@using FundaAssignment.Core.Models
+@inject IFundaApiClient fundaApiCLient
+@inject IMakelaarRankingService makelaarRankingService
 
-<PageTitle>Index</PageTitle>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 60%;
+        margin-bottom: 2rem;
+    }
 
-<h1>Hello, world!</h1>
+    th, td {
+        padding: 10px 20px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
 
-Welcome to your new app.
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+</style>
+
+<PageTitle>Funda - Top Makelaars Amsterdam</PageTitle>
+
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p style="color:red">@errorMessage</p>
+    }
+
+    <h1>Top 10 Makelaars in Amsterdam</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Makelaar</th>
+                <th>Listings</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i=0; i<amsterdamResults.Count; i++)
+            {
+                <tr>
+                    <td>@(i+1)</td>
+                    <td>@amsterdamResults[i].MakelaarNaam</td>
+                    <td>@amsterdamResults[i].ListingCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h1>Top 10 Makelaars in Amsterdam with Tuin</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Makelaar</th>
+                <th>Listings</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < amsterdamTuinResults.Count; i++)
+            {
+                <tr>
+                    <td>@(i+1)</td>
+                    <td>@amsterdamTuinResults[i].MakelaarNaam</td>
+                    <td>@amsterdamTuinResults[i].ListingCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code
+{
+    List<MakelaarListingCount> amsterdamResults = new();
+    List<MakelaarListingCount> amsterdamTuinResults = new();
+    bool isLoading = false;
+    string errorMessage = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        try
+        {
+            IEnumerable<Listing> amsterdamListings = await fundaApiCLient.GetAllListingsAsync("?type=koop&zo=/amsterdam/");
+            amsterdamResults = makelaarRankingService.GetTopMakelaars(amsterdamListings).ToList();
+        }
+        catch(Exception ex)
+        {
+            errorMessage = "Failed to get Amsterdam Listings, error: " + ex.Message;
+        }
+        
+        try
+        {
+            IEnumerable<Listing> amsterdamTuinListings = await fundaApiCLient.GetAllListingsAsync("?type=koop&zo=/amsterdam/tuin/");
+            amsterdamTuinResults = makelaarRankingService.GetTopMakelaars(amsterdamTuinListings).ToList();
+        }
+        catch(Exception ex)
+        {
+            errorMessage = "Failed to get Amsterdam with tuin Listings, error: " + ex.Message;
+        }
+
+        isLoading = false;
+    }
+
+	
+}
