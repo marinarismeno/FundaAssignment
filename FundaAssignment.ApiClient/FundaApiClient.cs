@@ -93,7 +93,7 @@ namespace FundaAssignment.ApiClient
                 requestCount++;
                 TimeSpan timePassed = DateTime.UtcNow.Subtract(windowStartTime);
 
-                if (timePassed.Minutes >= 1)
+                if (timePassed.TotalMinutes >= 1)
                 {
                     ResetCounting();
                     return;
