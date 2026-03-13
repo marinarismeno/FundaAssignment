@@ -12,6 +12,7 @@ namespace FundaAssignment.ApiClient
         private const int maxNumberOfRequestsPerMinute = 100;
         private int requestCount = 0;
         private DateTime windowStartTime = DateTime.UtcNow;
+        private readonly object lockObject = new object();
 
         public async Task<IEnumerable<Listing>> GetAllListingsAsync(string searchQuery, CancellationToken cancellationToken = default)
         {
@@ -75,8 +76,6 @@ namespace FundaAssignment.ApiClient
                     totalNumOfPages = fundaApiResponse.Paging.AantalPaginas;
                 }
 
-                requestCount++;
-
                 await ThrottleIfNeededAsync();
 
                 currentPage++;
@@ -87,21 +86,29 @@ namespace FundaAssignment.ApiClient
 
         private async Task ThrottleIfNeededAsync()
         {
-            TimeSpan timePassed = DateTime.UtcNow.Subtract(windowStartTime);
+            TimeSpan timeToWait = TimeSpan.Zero;
 
-            if (timePassed.Minutes >= 1)
+            lock (lockObject)
             {
-                ResetCounting();
-                return;
+                requestCount++;
+                TimeSpan timePassed = DateTime.UtcNow.Subtract(windowStartTime);
+
+                if (timePassed.Minutes >= 1)
+                {
+                    ResetCounting();
+                    return;
+                }
+
+                if (requestCount >= maxNumberOfRequestsPerMinute)
+                {
+                    timeToWait = TimeSpan.FromMinutes(1) - timePassed;
+                    ResetCounting();
+                }
             }
 
-            if (requestCount >= maxNumberOfRequestsPerMinute)
+            if (timeToWait > TimeSpan.Zero)
             {
-                TimeSpan timeToAMinute = TimeSpan.FromMinutes(1) - timePassed;
-
-                await Task.Delay((int)timeToAMinute.TotalMilliseconds);
-
-                ResetCounting();
+                await Task.Delay((int)timeToWait.TotalMilliseconds);
             }
         }
 

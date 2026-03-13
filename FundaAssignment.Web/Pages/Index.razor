@@ -6,24 +6,24 @@
 
 <style>
     table {
-        border-collapse: collapse;
-        width: 60%;
-        margin-bottom: 2rem;
+    border-collapse: collapse;
+    width: 60%;
+    margin-bottom: 2rem;
     }
 
     th, td {
-        padding: 10px 20px;
-        text-align: center;
-        border: 1px solid #ddd;
+    padding: 10px 20px;
+    text-align: center;
+    border: 1px solid #ddd;
     }
 
     th {
-        background-color: #f2f2f2;
-        font-weight: bold;
+    background-color: #f2f2f2;
+    font-weight: bold;
     }
 
     tr:nth-child(even) {
-        background-color: #f9f9f9;
+    background-color: #f9f9f9;
     }
 </style>
 
@@ -92,33 +92,39 @@ else
     bool isLoading = false;
     string errorMessage = string.Empty;
 
-
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
 
+        await Task.WhenAll(GetTopMakelaarsAmsterdam(), GetTopMakelaarsAmsterdamTuin());
+
+        isLoading = false;
+    }
+
+    async Task GetTopMakelaarsAmsterdam()
+    {
         try
         {
             IEnumerable<Listing> amsterdamListings = await fundaApiCLient.GetAllListingsAsync("?type=koop&zo=/amsterdam/");
             amsterdamResults = makelaarRankingService.GetTopMakelaars(amsterdamListings).ToList();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             errorMessage = "Failed to get Amsterdam Listings, error: " + ex.Message;
         }
-        
+    }
+
+    async Task GetTopMakelaarsAmsterdamTuin()
+    {
         try
         {
             IEnumerable<Listing> amsterdamTuinListings = await fundaApiCLient.GetAllListingsAsync("?type=koop&zo=/amsterdam/tuin/");
             amsterdamTuinResults = makelaarRankingService.GetTopMakelaars(amsterdamTuinListings).ToList();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             errorMessage = "Failed to get Amsterdam with tuin Listings, error: " + ex.Message;
         }
-
-        isLoading = false;
     }
 
-	
 }

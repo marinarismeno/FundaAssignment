@@ -63,6 +63,8 @@ dotnet run
 
 - **`AddTransient` for MakelaarRankingService** — I hadn't used dependency injection lifetimes before. After researching, Transient was the right choice because the service is stateless — it holds no data between calls, so a new instance each time is safe and appropriate.
 
+- **Parallel queries** — Since I had some extra time I tried something new to me: making the two API queries run in parallel using `Task.WhenAll`, hoping to roughly halve the loading time compared to running them sequentially. In practice this reduced the loading time from around 4 minutes to 3 minutes (so 25% faster). The rate limiter was made thread safe using a `lock` to handle concurrent access to the shared request counter and window timer.
+
 ---
 
 ## Potential Improvements
@@ -70,8 +72,6 @@ dotnet run
 - **More testing** — the API client could be tested by mocking the `HttpMessageHandler` to simulate rate limiting, retries and error responses without making real HTTP calls.
 
 - **Configurable settings** — max retries and page size are currently hardcoded. Moving them to `appsettings.json` would make the application easier to configure without recompiling.
-
-- **Parallel queries** — the two queries currently run sequentially. Running them in parallel with `Task.WhenAll` would roughly halve the loading time. This would require making the rate limiter thread safe first.
 
 - **Caching** — storing the results so that refreshing the page does not trigger a full re-fetch every time.
 
