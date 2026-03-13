@@ -76,3 +76,22 @@ dotnet run
 - **Caching** — storing the results so that refreshing the page does not trigger a full re-fetch every time.
 
 - **Progress indicator** — instead of a simple "Loading..." message, showing how many pages have been fetched out of the total would give the user better feedback and make it clear the application is still working.
+
+---
+
+## Use of AI
+
+AI was used throughout this assignment because, well, I haven't been living under a rock. AI is a valuable tool for developers. It cuts down on development time and when used with critical thinking can result in better, cleaner results. Since this was an assignment I wanted to learn from, one of my prompts was "I don't want you to give me the answer, just help me get to it."
+
+Specifically AI was used for:
+
+- **Technology choices** — asking what UI options would fit a C# backend position, which led to choosing Blazor Server
+- **Blazor Server** — learning the basics of components, data binding and dependency injection in a web context
+- **LINQ** — guidance on grouping and ordering syntax
+- **Unit tests** — learning xUnit syntax and structure, having prior experience only with NUnit
+- **Parallel queries** — understanding `Task.WhenAll` and thread safety concepts like `lock`
+- **README** — structure suggestions and text improvements
+
+---
+
+This was a lot of fun! :)
