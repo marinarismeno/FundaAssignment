@@ -24,8 +24,7 @@ namespace FundaAssignment.ApiClient
 
             do
             {
-                string stringResponse = string.Empty; 
-
+                string stringResponse;
                 try
                 {
                     stringResponse = await httpClient.GetStringAsync(uri + "&page=" + currentPage + "&pagesize=" + settings.PageSize, cancellationToken);
